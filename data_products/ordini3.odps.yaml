@@ -1,7 +1,7 @@
 # Data Product di prova: un prodotto, una output port, un contratto, una tabella.
 apiVersion: v1.0.0
 kind: DataProduct
-name: Ordini2
+name: Ordini3
 version: 1.0.0
 status: draft
 domain: prova
