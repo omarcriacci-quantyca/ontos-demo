@@ -38,6 +38,14 @@ jobs:
           token=$(curl -sS --fail -u "$CLIENT_ID:$CLIENT_SECRET" "$DATABRICKS_HOST/oidc/v1/token" \
             -d grant_type=client_credentials -d scope=all-apis | jq -r .access_token)
 
-          curl -sS --fail-with-body -H "Authorization: Bearer $token" \
+          code=$(curl -sS -o response.json -w '%{http_code}' -H "Authorization: Bearer $token" \
             "${args[@]}" -F adopt_ids=true -F on_duplicate=skip \
-            "$ONTOS_URL/api/data-products/upload"
+            "$ONTOS_URL/api/data-products/upload")
+          cat response.json; echo
+          
+          if [ "$code" = "200" ]; then
+            echo "Richiesta riuscita (HTTP $code)"
+          else
+            echo "Richiesta fallita (HTTP $code)"
+            exit 1
+          fi
