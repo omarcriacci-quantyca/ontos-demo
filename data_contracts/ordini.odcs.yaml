@@ -1,0 +1,102 @@
+# Data Contract di prova: una sola tabella, prova_ontos.prova_schema.ordini.
+# Prima di importare creare la tabella con create-demo-table.sql, altrimenti il job di validazione va in errore.
+kind: DataContract
+apiVersion: v3.1.0
+version: 1.0.0
+status: draft
+name: Ordini
+domain: prova
+
+description:
+  purpose: Ordini di esempio, una riga per ordine, nello stato più recente.
+  usage: Dati di prova per la demo del ciclo di vita su Ontos.
+  limitations: Dati fittizi.
+
+schema:
+  - id: ordini_obj
+    name: ordini
+    physicalName: prova_ontos.prova_schema.ordini
+    physicalType: table
+    businessName: Ordini
+    description: Una riga per ordine.
+    tags: ['domain/prova']
+    properties:
+      - id: order_id_prop
+        name: order_id
+        logicalType: string
+        physicalType: string
+        primaryKey: true
+        primaryKeyPosition: 1
+        required: true
+        unique: true
+        classification: internal
+        description: Identificativo univoco dell'ordine.
+        quality:
+          - type: library
+            metric: nullValues
+            mustBe: 0
+            dimension: completeness
+            severity: error
+          - type: library
+            metric: duplicateValues
+            mustBe: 0
+            dimension: uniqueness
+            severity: error
+      - id: product_category_prop
+        name: product_category
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: internal
+        description: Categoria del prodotto ordinato.
+      - id: order_status_prop
+        name: order_status
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: internal
+        description: Stato corrente dell'ordine.
+        quality:
+          - type: library
+            metric: invalidValues
+            arguments:
+              validValues: ['Open', 'Shipped', 'Delivered', 'Cancelled']
+            mustBe: 0
+            dimension: conformity
+            severity: warning
+      - id: amount_prop
+        name: amount
+        logicalType: number
+        physicalType: decimal(10,2)
+        required: true
+        classification: internal
+        description: Importo dell'ordine.
+        quality:
+          - type: sql
+            query: SELECT COUNT(*) FROM prova_ontos.prova_schema.ordini WHERE amount < 0
+            mustBe: 0
+            dimension: accuracy
+            severity: error
+      - id: created_date_prop
+        name: created_date
+        logicalType: timestamp
+        physicalType: timestamp
+        required: true
+        classification: internal
+        description: Data e ora di creazione.
+      - id: modified_date_prop
+        name: modified_date
+        logicalType: timestamp
+        physicalType: timestamp
+        required: true
+        classification: internal
+        description: Data e ora dell'ultima modifica.
+    quality:
+      - type: library
+        metric: rowCount
+        mustBeGreaterThan: 0
+        dimension: completeness
+        severity: error
+
+tags:
+  - domain/prova
