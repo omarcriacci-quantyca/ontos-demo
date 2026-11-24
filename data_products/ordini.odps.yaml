@@ -1,0 +1,37 @@
+# Data Product di prova: un prodotto, una output port, un contratto, una tabella.
+apiVersion: v1.0.0
+kind: DataProduct
+name: Ordini
+version: 1.0.0
+status: draft
+domain: prova
+
+description:
+  purpose: Rendere disponibili gli ordini di esempio in forma curata.
+  usage: Richiedere l'accesso al prodotto e leggere la tabella ordini.
+
+outputPorts:
+  - id: op-ordini
+    name: ordini-out
+    version: 1.0.0
+    type: Table
+    description: Tabella degli ordini.
+    contractId: 3b1f6c2e-7a54-4d0b-9e1a-5c8d2f40a111
+    assetType: table
+    assetIdentifier: prova_ontos.prova_schema.ordini
+    server:
+      database: prova_ontos
+      schema: prova_schema
+      table: ordini
+
+team:
+  name: Team Prova
+  description: Responsabile del prodotto.
+  members:
+    - username: mattia.bindella@quantyca.it
+      name: Mattia Bindella
+      role: owner
+      dateIn: "2026-11-24"
+
+tags:
+  - domain/prova
