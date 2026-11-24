@@ -1,7 +1,7 @@
 # Data Product di prova: un prodotto, una output port, un contratto, una tabella.
 apiVersion: v1.0.0
 kind: DataProduct
-name: Ordini
+name: Ordini2
 version: 1.0.0
 status: draft
 domain: prova
@@ -16,7 +16,7 @@ outputPorts:
     version: 1.0.0
     type: Table
     description: Tabella degli ordini.
-    contractId: 3b1f6c2e-7a54-4d0b-9e1a-5c8d2f40a111
+    contractId: e580ff12-f73b-46b8-8847-4196fb1499ff
     assetType: table
     assetIdentifier: prova_ontos.prova_schema.ordini
     server:
