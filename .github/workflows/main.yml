@@ -1,0 +1,43 @@
+# Carica in Ontos i file aggiunti in data_products/.
+#
+# Variabili: DATABRICKS_HOST, ONTOS_URL
+# Secret:    DATABRICKS_CLIENT_ID, DATABRICKS_CLIENT_SECRET (service principal con CAN USE sull'app)
+
+name: Import data product in Ontos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data_products/**'
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Carica i file in Ontos
+        env:
+          DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+          ONTOS_URL: ${{ vars.ONTOS_URL }}
+          CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+
+          args=()
+          while IFS= read -r f; do
+            args+=(-F "files=@$f")
+          done < <(git -c core.quotepath=off diff --name-only --diff-filter=A "$BEFORE" HEAD -- data_products/)
+          [ ${#args[@]} -eq 0 ] && exit 0
+
+          token=$(curl -sS --fail -u "$CLIENT_ID:$CLIENT_SECRET" "$DATABRICKS_HOST/oidc/v1/token" \
+            -d grant_type=client_credentials -d scope=all-apis | jq -r .access_token)
+
+          curl -sS --fail-with-body -H "Authorization: Bearer $token" \
+            "${args[@]}" -F adopt_ids=true -F on_duplicate=skip \
+            "$ONTOS_URL/api/data-products/upload"
